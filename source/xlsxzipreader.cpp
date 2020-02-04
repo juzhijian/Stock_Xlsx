@@ -25,7 +25,7 @@
 
 #include "xlsxzipreader_p.h"
 
-#include <private/qzipreader_p.h>
+#include <QtGui/private/qzipreader_p.h>
 
 QT_BEGIN_NAMESPACE_XLSX
 

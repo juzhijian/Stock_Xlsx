@@ -6,6 +6,7 @@
 #include <QFileDialog>          //打开文件
 #include <QDebug>               //调试消息
 #include <QMessageBox>      //显示提示框
+#include <QtCore>
 
 //Qxlsx类
 #include "xlsxdocument.h"

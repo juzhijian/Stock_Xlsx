@@ -4,7 +4,7 @@
 
 #include <QtGlobal>
 #include <QDebug>
-#include <private/qzipwriter_p.h>
+#include <QtGui/private/qzipwriter_p.h>
 
 QT_BEGIN_NAMESPACE_XLSX
 
