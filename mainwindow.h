@@ -5,7 +5,7 @@
 
 #include <QFileDialog>          //打开文件
 #include <QDebug>               //调试消息
-#include <QMessageBox>      //显示提示框
+#include <QMessageBox>          //显示提示框
 #include <QtCore>
 
 //Qxlsx类
@@ -36,7 +36,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QMap<QString,double> Wupin_Map; //定义一个物品列表 物品名称 价格
+    QMap<QString,double> Wupin_Map;                //定义一个物品列表 物品名称 价格
     QStringList list_bumen;                        //定义一个部门的列表
     QStringList list_wupin;                        //定义一个物品的列表
 };
