@@ -92,7 +92,7 @@ void MainWindow::on_pushButton_jiexi_clicked()
 		else if (list_wupin.contains(doc.read(i, 3).toString()) == true
 			&& Wupin_Map[doc.read(i, 3).toString()] != doc.read(i, 6))                               //搜索物品列表是否存在 且 价格不同
 		{
-			ui->textBrowser->append(QStringLiteral("%1物品单价重复").arg(doc.read(i, 3).toString()));	 //文本框提示消息
+			ui->textBrowser->append(QStringLiteral("第 %1 行，%2物品单价重复！").arg(i).arg(doc.read(i, 3).toString()));	 //文本框提示消息
 			qDebug() << Wupin_Map[doc.read(i, 3).toString()] << "x" << doc.read(i, 6).toString();
 		}
 		else if (doc.read(i, 3).toString() == "")                                                    //表格数据空
@@ -136,7 +136,7 @@ void MainWindow::on_pushButton_jiexi_clicked()
 			&&Wupin_Map[doc.read(i, 3).toString()] != doc.read(i, 6))
 		{
 			qDebug() << QStringLiteral("%1 单价不同 记录值：%2 读取值：%3").arg(doc.read(i, 3).toString()).arg(Wupin_Map[doc.read(i, 3).toString()]).arg(doc.read(i, 6).toString());
-			ui->textBrowser->append(QStringLiteral("%1 单价不同 记录值：%2 读取值：%3").arg(doc.read(i, 3).toString()).arg(Wupin_Map[doc.read(i, 3).toString()]).arg(doc.read(i, 6).toString()));
+			ui->textBrowser->append(QStringLiteral("第 %1 行，%2 单价不同 记录值：%3 读取值：%4").arg(i).arg(doc.read(i, 3).toString()).arg(Wupin_Map[doc.read(i, 3).toString()]).arg(doc.read(i, 6).toString()));
 		}
 		else if (doc.read(i, 1).toString() == "")
 		{
@@ -215,8 +215,29 @@ void MainWindow::on_pushButton_jiexi_clicked()
 	}
 
 	/*循环写入物品数量*/
+	for (int i = 4, j = 0; j < list_bumen.size(); ++j)
+	{
+		/*临时读取当前物品信息*/
+		QJsonObject json_Danju;
+		json_Danju = Danju_Object.value(list_bumen.at(j)).toObject();           //当前物品信息
+		qDebug() << list_bumen.at(j) <<json_Danju;
+		int Bumen_row = i;
+		for (int i = 2,k=0; k < list_wupin.size(); ++k)
+		{
+			if (!json_Danju[xlsxDoc.read(1, i).toString()].isNull())
+			{
+				qDebug() << "写入" << xlsxDoc.read(1, i).toString() << "数量";
+				/*写入数量*/
+				xlsxDoc.write(Bumen_row, i, json_Danju[xlsxDoc.read(1, i).toString()].toDouble(), NeirongStyle);           //写入数量 行，列，内容，样式
+				/*写入价格*/
+				xlsxDoc.write(Bumen_row, i + 1, json_Danju[xlsxDoc.read(1, i).toString()].toDouble()*xlsxDoc.read(2, i + 1).toDouble(), NeirongStyle);
+			}
+			i = i + 2;
+		}
 
-
+		i = i + 1;
+	}
+	qDebug() << QStringLiteral("解析成功");
 	/*保存文档*/
 	xlsxDoc.saveAs("datetime.xlsx");
 }
