@@ -49,7 +49,7 @@ void MainWindow::on_pushButton_jiexi_clicked()
     QXlsx::Document doc(ui->lineEdit->text());                                                                             //读取文件
     int rowCounts = doc.dimension().lastRow();                                                                             //获取打开文件的最后一行（注意，如果最后一行有空格也为有效行）
     int colCounts = doc.dimension().lastColumn();                                                                          //获取打开文件的最后一列
-    qDebug()<<QString("最大行数：%1 最大列数：%2").arg(rowCounts).arg(colCounts);
+
 	if (!doc.load())
 	{
         QMessageBox::information(this,"错误","文件打开失败！请检查文件或路径！","确定");
