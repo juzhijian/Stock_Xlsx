@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 	, ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-    this->initForm();
+	this->initForm();
 	/*
 	ui->lineEdit->setText(QStringLiteral("C:/Users/MECHREVO/Desktop/材料出库明细表.xlsx"));		                               //测试写入
 	*/
@@ -21,12 +21,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::initForm()
 {
-    //引入图形字体
-    int fontId = QFontDatabase::addApplicationFont(":/image/fontawesome-webfont.ttf");
-    QString fontName = QFontDatabase::applicationFontFamilies(fontId).at(0);
-    iconFont = QFont(fontName);
+	//引入图形字体
+	int fontId = QFontDatabase::addApplicationFont(":/image/fontawesome-webfont.ttf");
+	QString fontName = QFontDatabase::applicationFontFamilies(fontId).at(0);
+	iconFont = QFont(fontName);
 
-    //QTimer::singleShot(100, this, SLOT(initPanelWidget()));
+	//QTimer::singleShot(100, this, SLOT(initPanelWidget()));
 }
 
 
@@ -45,18 +45,18 @@ void MainWindow::on_toolButton_clicked()
 /*解析Excel*/
 void MainWindow::on_pushButton_jiexi_clicked()
 {
-    /*打开文件*/
-    QXlsx::Document doc(ui->lineEdit->text());                                                                             //读取文件
-    int rowCounts = doc.dimension().lastRow();                                                                             //获取打开文件的最后一行（注意，如果最后一行有空格也为有效行）
-    int colCounts = doc.dimension().lastColumn();                                                                          //获取打开文件的最后一列
+	/*打开文件*/
+	QXlsx::Document doc(ui->lineEdit->text());                                                                             //读取文件
+	int rowCounts = doc.dimension().lastRow();                                                                             //获取打开文件的最后一行（注意，如果最后一行有空格也为有效行）
+	int colCounts = doc.dimension().lastColumn();                                                                          //获取打开文件的最后一列
 
 	if (!doc.load())
 	{
-        QMessageBox::information(this,"错误","文件打开失败！请检查文件或路径！","确定");
+		QMessageBox::information(this, "错误", "文件打开失败！请检查文件或路径！", "确定");
 		return;
 	}
 
-    qDebug() << QStringLiteral("最大行数：%1 最大列数：%2").arg(rowCounts).arg(colCounts);
+	qDebug() << QStringLiteral("最大行数：%1 最大列数：%2").arg(rowCounts).arg(colCounts);
 
 
 	/*读取操作*/
@@ -248,7 +248,7 @@ void MainWindow::on_pushButton_jiexi_clicked()
 		{
 			if (!json_Danju[xlsxDoc.read(1, i).toString()].isNull())
 			{
-                //qDebug() << "写入" << xlsxDoc.read(1, i).toString() << "数量";
+				//qDebug() << "写入" << xlsxDoc.read(1, i).toString() << "数量";
 				/*写入数量*/
 				xlsxDoc.write(Bumen_row, i, json_Danju[xlsxDoc.read(1, i).toString()].toDouble(), NeirongStyle);           //写入数量 行，列，内容，样式
 				/*写入价格*/
