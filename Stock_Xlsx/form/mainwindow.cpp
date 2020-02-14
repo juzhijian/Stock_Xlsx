@@ -52,7 +52,8 @@ void MainWindow::on_pushButton_jiexi_clicked()
 
 	if (!doc.load())
 	{
-		QMessageBox::information(this, "错误", "文件打开失败！请检查文件或路径！", "确定");
+		//QMessageBox::information(this, "错误", "文件打开失败！请检查文件或路径！", "确定");
+		QUIWidget::showMessageBoxError("文件打开失败！请检查文件或路径！");
 		return;
 	}
 
