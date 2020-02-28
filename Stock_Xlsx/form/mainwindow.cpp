@@ -59,21 +59,22 @@ void MainWindow::on_pushButton_jiexi_clicked()
 
 	qDebug() << QString("最大行数：%1 最大列数：%2").arg(rowCounts).arg(colCounts);
 
-
-	/*读取操作*/
+	//---------------------------------------------------------------------------
+	// 读取操作
+	//---------------------------------------------------------------------------
 
 	/*读取部门信息*/
 	for (int i = 3; i <= rowCounts; ++i)
 	{
-		qDebug() << QString("读取部门第 %1 遍").arg(i);
+		//qDebug() << QString("读取部门第 %1 遍").arg(i);
 		if (doc.read(i, 1).toString() != ""&&list_bumen.contains(doc.read(i, 1).toString()) == false)                      //获取表格不为空
 		{
-			qDebug() << QString("加入部门数据 : %1").arg(doc.read(i, 1).toString());
+			//qDebug() << QString("加入部门数据 : %1").arg(doc.read(i, 1).toString());
 			list_bumen.append(doc.read(i, 1).toString());
 		}
 		else
 		{
-			qDebug() << QString("跳过部门数据 : %1").arg(doc.read(i, 1).toString());
+			//qDebug() << QString("跳过部门数据 : %1").arg(doc.read(i, 1).toString());
 		}
 	}
 
@@ -84,18 +85,18 @@ void MainWindow::on_pushButton_jiexi_clicked()
 	/*读取物品信息*/
 	for (int i = 3, k = 0; i <= rowCounts; ++i)
 	{
-		qDebug() << QString("读取物品第 %1 遍").arg(k);
+		//qDebug() << QString("读取物品第 %1 遍").arg(k);
 
 		if (doc.read(i, 3).toString() != ""
 			&&list_wupin.contains(doc.read(i, 3).toString()) == false)                                                     //获取表格不为空 且 物品列表无
 		{
 			/*向物品列表写入数据*/
 			list_wupin.append(doc.read(i, 3).toString());                                                                  //加入进物品列表
-			qDebug() << QString("加入物品数据 : %1").arg(doc.read(i, 3).toString());
+			//qDebug() << QString("加入物品数据 : %1").arg(doc.read(i, 3).toString());
 
 			/*写入map 记录 物品名称 单价*/
 			Wupin_Map.insert(doc.read(i, 3).toString(), doc.read(i, 6).toDouble());                                        //向map里添加一对“物品吗-单价”
-			qDebug() << QString("加入 %1 单价 : %2").arg(doc.read(i, 3).toString()).arg(doc.read(i, 6).toDouble());
+			//qDebug() << QString("加入 %1 单价 : %2").arg(doc.read(i, 3).toString()).arg(doc.read(i, 6).toDouble());
 
 			/*写入json*/
 			Wupin_data_Object.insert("name", doc.read(i, 3).toString());                                                   //物品名称
@@ -109,15 +110,15 @@ void MainWindow::on_pushButton_jiexi_clicked()
 			&& Wupin_Map[doc.read(i, 3).toString()] != doc.read(i, 6))                                                     //搜索物品列表是否存在 且 价格不同
 		{
 			ui->textBrowser->append(QString("第 %1 行，%2物品单价重复！").arg(i).arg(doc.read(i, 3).toString()));             //文本框提示消息
-			qDebug() << Wupin_Map[doc.read(i, 3).toString()] << "x" << doc.read(i, 6).toString();
+			//qDebug() << Wupin_Map[doc.read(i, 3).toString()] << "x" << doc.read(i, 6).toString();
 		}
 		else if (doc.read(i, 3).toString() == "")                                                                          //表格数据空
 		{
-			qDebug() << QString("空物品数据");
+			//qDebug() << QString("空物品数据");
 		}
 		else
 		{
-			qDebug() << QString("重复物品数据 : %1").arg(doc.read(i, 3).toString());
+			//qDebug() << QString("重复物品数据 : %1").arg(doc.read(i, 3).toString());
 		}
 	}
 
@@ -129,41 +130,53 @@ void MainWindow::on_pushButton_jiexi_clicked()
 	for (int i = 3; i < rowCounts; ++i)
 	{
 		if (doc.read(i, 1).toString() != ""
-			&&Wupin_Map[doc.read(i, 3).toString()] == doc.read(i, 6))                                                      //单据行不为空 且 单价相同
+			&&Wupin_Map[doc.read(i, 3).toString()] == doc.read(i, 6))                                 //单据行不为空 且 单价相同
 		{
 			/*从josn获取当前单据数据*/
-			Danju_data_Object = Danju_Object.value(doc.read(i, 1).toString()).toObject();                                  //当前单据数据
+			Danju_data_Object = Danju_Object.value(doc.read(i, 1).toString()).toObject();           //当前单据数据
+
+			/*!
+			 *  doc.read(i, 5) 为 QVariant 类型
+			 *	读取数据为str
+			 *  转换为str后搜索字符串
+			 */
+			 
+			QString name = doc.read(i, 5).toString();
+
+			/*! 判断数量是否为 double */
+			if (name.contains(".", Qt::CaseSensitive)) {
+				ui->textBrowser->append(QString("物品：%1 数量为小数。").arg(doc.read(i, 3).toString()));
+			}
 
 			/*单据当前物品信息不存在，则写入当前读取信息*/
-			if (Danju_data_Object[doc.read(i, 3).toString()].isNull())
-			{
-				Danju_data_Object.insert(doc.read(i, 3).toString(), doc.read(i, 5).toDouble());                            //写入单据数据 物品名称 数量
+			if (Danju_data_Object[doc.read(i, 3).toString()].isNull()) {
+				Danju_data_Object.insert(doc.read(i, 3).toString(), doc.read(i, 5).toDouble());           //写入单据数据 物品名称 数量
 				Danju_Object.insert(doc.read(i, 1).toString(), Danju_data_Object);
 			}
 			/*单据当前物品信息不为空，则原始数量+当前读取数量*/
 			else if (!Danju_data_Object[doc.read(i, 3).toString()].isNull())
 			{
 				Danju_data_Object.insert(doc.read(i, 3).toString(),
-					doc.read(i, 5).toDouble() + Danju_data_Object[doc.read(i, 3).toString()].toDouble());                  //写入单据数据 物品名称 原始数量+读取数量
+					doc.read(i, 5).toDouble() + Danju_data_Object[doc.read(i, 3).toString()].toDouble());//写入单据数据 物品名称 原始数量+读取数量
 				Danju_Object.insert(doc.read(i, 1).toString(), Danju_data_Object);
 			}
 		}
 		else if (doc.read(i, 1).toString() != ""
-			&&Wupin_Map[doc.read(i, 3).toString()] != doc.read(i, 6))
+			&&Wupin_Map[doc.read(i, 3).toString()] != doc.read(i, 6))/*!< 单据行不为空 且 价格不同 */
 		{
-			qDebug() << QString("%1 单价不同 记录值：%2 读取值：%3").arg(doc.read(i, 3).toString()).arg(Wupin_Map[doc.read(i, 3).toString()]).arg(doc.read(i, 6).toString());
+			//qDebug() << QString("%1 单价不同 记录值：%2 读取值：%3").arg(doc.read(i, 3).toString()).arg(Wupin_Map[doc.read(i, 3).toString()]).arg(doc.read(i, 6).toString());
 			ui->textBrowser->append(QString("第 %1 行，%2 单价不同 记录值：%3 读取值：%4").arg(i).arg(doc.read(i, 3).toString()).arg(Wupin_Map[doc.read(i, 3).toString()]).arg(doc.read(i, 6).toString()));
 		}
 		else if (doc.read(i, 1).toString() == "")
 		{
-			qDebug() << QString("空单据数据");
+			//qDebug() << QString("空单据数据");
 		}
 	}
 
-	qDebug() << Wupin_Object;
-	qDebug() << Danju_Object;
-	qDebug() << QString("部门数据共 %1 条：%2").arg(list_bumen.size()).arg(list_bumen.join(","));
-	qDebug() << QString("物品数据共 %1 条：%2").arg(list_wupin.size()).arg(list_wupin.join(","));
+	//qDebug() << Wupin_Object;
+	//qDebug() << Danju_Object;
+	//qDebug() << QString("部门数据共 %1 条：%2").arg(list_bumen.size()).arg(list_bumen.join(","));
+	//qDebug() << QString("物品数据共 %1 条：%2").arg(list_wupin.size()).arg(list_wupin.join(","));
 
 
 	/*设置样式*/
@@ -196,6 +209,10 @@ void MainWindow::on_pushButton_jiexi_clicked()
 	xlsxDoc.setColumnWidth(day*2, day*2, 13);                                                                              //设置列宽
 	*/
 
+	//---------------------------------------------------------------------------
+	// 写入操作
+	//---------------------------------------------------------------------------
+
 	/*单独写入*/
 	xlsxDoc.write(1, 1, QString("品    名"), NeirongStyle);
 	xlsxDoc.write(2, 1, QString("单位单价"), NeirongStyle);
@@ -203,11 +220,11 @@ void MainWindow::on_pushButton_jiexi_clicked()
 
 	/*循环写入部门*/
 	for (int i = 0; i < list_bumen.size(); ++i) {
-		xlsxDoc.write(i + 4, 1, list_bumen.at(i), BumenStyle);                                                             //写入数据
-		qDebug() << QString("部门%1 ID：%2").arg(list_bumen.at(i)).arg(i);
+		xlsxDoc.write(i + 4, 1, list_bumen.at(i), BumenStyle);                           //写入数据
+		//qDebug() << QString("部门%1 ID：%2").arg(list_bumen.at(i)).arg(i);
 	}
 
-	int row = xlsxDoc.dimension().lastRow();                                                                               //获取打开文件的最后一行（注意，如果最后一行有空格也为有效行）
+	int row = xlsxDoc.dimension().lastRow();                                             //获取打开文件的最后一行（注意，如果最后一行有空格也为有效行）
 
 	/*循环写入物品*/
 	for (int i = 2, j = 0; j < list_wupin.size(); ++j) {
@@ -224,9 +241,14 @@ void MainWindow::on_pushButton_jiexi_clicked()
 		xlsxDoc.write(3, i + 1, QString("金额"), NeirongStyle);                                                       //写入金额 行，列，内容，样式
 
 		/*写入合计 行，列，内容，样式*/
-		xlsxDoc.write(row + 1, i, QString("=SUM(%1)").arg(QXlsx::CellRange(4, i, row, i).toString(false)), NeirongStyle);
+		if (ui->checkBox->isChecked() == true) {
+			xlsxDoc.write(row + 1, i, QString("=SUM(%1)").arg(QXlsx::CellRange(4, i, row, i).toString(false)), NeirongStyle);
+		}
+
 		/*写入合计 行，列，内容，样式*/
-		xlsxDoc.write(row + 1, i + 1, QString("=SUM(%1)").arg(QXlsx::CellRange(4, i + 1, row, i + 1).toString(false)), NeirongStyle);
+		if (ui->checkBox_2->isChecked() == true) {
+			xlsxDoc.write(row + 1, i + 1, QString("=SUM(%1)").arg(QXlsx::CellRange(4, i + 1, row, i + 1).toString(false)), NeirongStyle);
+		}
 
 		/*循环设置单元格样式*/
 		xlsxDoc.mergeCells(QXlsx::CellRange(1, i, 1, i + 1), WupinStyle);                                                  //合并单元格
@@ -234,41 +256,47 @@ void MainWindow::on_pushButton_jiexi_clicked()
 		xlsxDoc.setColumnWidth(i + 1, 9);                                                                                  //设置列宽
 		i = i + 2;
 
-		qDebug() << QString("ID：%1 物品名：%2 单价：%3").arg(j).arg(list_wupin.at(j)).arg(Wupin_Map[list_wupin.at(j)]);
+		//qDebug() << QString("ID：%1 物品名：%2 单价：%3").arg(j).arg(list_wupin.at(j)).arg(Wupin_Map[list_wupin.at(j)]);
 	}
 
-	/*循环写入物品数量*/
+	/*循环写入物品信息*/
+
+	double Number = 0;                                               /*!< 记录物品数量 */
+	double Price = 0;                                                /*!< 记录物品价格 */
+
 	for (int i = 4, j = 0; j < list_bumen.size(); ++j)
 	{
 		/*临时读取当前物品信息*/
 		QJsonObject json_Danju;
-		json_Danju = Danju_Object.value(list_bumen.at(j)).toObject();                                                      //当前物品信息
-		qDebug() << list_bumen.at(j) << json_Danju;
-		int Bumen_row = i;
+		json_Danju = Danju_Object.value(list_bumen.at(j)).toObject();/*!< 当前读入的物品信息 */
+		//qDebug() << list_bumen.at(j) << json_Danju;
+		int Bumen_row = i;                                           /*!< 部门第i行 */
+
 		for (int i = 2, k = 0; k < list_wupin.size(); ++k)
 		{
 			if (!json_Danju[xlsxDoc.read(1, i).toString()].isNull())
 			{
 				//qDebug() << "写入" << xlsxDoc.read(1, i).toString() << "数量";
-				/*写入数量*/
-				if (ui->checkBox->isChecked() == true)
-				{
-					xlsxDoc.write(Bumen_row, i, json_Danju[xlsxDoc.read(1, i).toString()].toDouble(), NeirongStyle);     //写入数量 行，列，内容，样式
-				}
 
-				/*写入价格*/
-				if (ui->checkBox_2->isChecked() == true)
-				{
-					xlsxDoc.write(Bumen_row, i + 1, json_Danju[xlsxDoc.read(1, i).toString()].toDouble()*xlsxDoc.read(2, i + 1).toDouble(), NeirongStyle);
-				}
+				/*! 写入数量 */
+				xlsxDoc.write(Bumen_row, i, json_Danju[xlsxDoc.read(1, i).toString()].toDouble(), NeirongStyle);     /*!< 写入数量 行，列，内容，样式 */
+				Number = Number + json_Danju[xlsxDoc.read(1, i).toString()].toDouble();/*!< 加入数量 */
+
+				/*! 写入价格 */
+				xlsxDoc.write(Bumen_row, i + 1, json_Danju[xlsxDoc.read(1, i).toString()].toDouble()*xlsxDoc.read(2, i + 1).toDouble(), NeirongStyle);
+				Price = Price + json_Danju[xlsxDoc.read(1, i).toString()].toDouble()*xlsxDoc.read(2, i + 1).toDouble();
 			}
 			i = i + 2;
 		}
 		i = i + 1;
 	}
 
+	xlsxDoc.write(xlsxDoc.dimension().lastRow() + 1, 1, QString("总数量：%1 ，总价格：%2").arg(Number).arg(Price));
+
 	qDebug() << QString("解析成功");
 	ui->textBrowser->append(QString("解析成功"));
-	/*保存文档*/
-	xlsxDoc.saveAs("datetime.xlsx");
+	ui->textBrowser->append(QString("总数量：%1 ，总价格：%2").arg(Number).arg(Price));
+
+	/*! 保存文档 */
+	xlsxDoc.saveAs("data.xlsx");
 }
