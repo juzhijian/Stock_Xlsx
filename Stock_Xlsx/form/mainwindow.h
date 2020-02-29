@@ -38,7 +38,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
     QFont iconFont;             //图形字体
     QMap<QString,double> Wupin_Map;                //定义一个物品列表 物品名称 价格
     QStringList list_bumen;                        //定义一个部门的列表
